@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { google, drive_v3 } from 'googleapis';
 import { Readable } from 'stream';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class GoogleDriveService {
   private drive: drive_v3.Drive;
 
-  constructor() {
+  constructor(private configService: ConfigService) {
+    const keyFilePath = this.configService.get<string>('GOOGLE_KEY_FILE_PATH');
     const auth = new google.auth.GoogleAuth({
-      keyFile: './learnify-442016-0a9258abae7c.json',
+      keyFile: keyFilePath,
       scopes: ['https://www.googleapis.com/auth/drive'],
     });
 
