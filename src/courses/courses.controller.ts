@@ -37,7 +37,7 @@ export class CoursesController {
     return this.coursesServices.findAll();
   }
 
-  @Get()
+  @Get('/filtered')
   getFilteredCourses(
     @Body() filterCourseDto: FilterCoursesDto,
   ): Promise<Course[] | null> {
