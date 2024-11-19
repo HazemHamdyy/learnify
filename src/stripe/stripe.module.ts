@@ -16,6 +16,7 @@ import { StripeService } from './stripe.service';
         });
       },
     },
+    StripeService,
   ],
   exports: ['STRIPE', StripeService],
 })
