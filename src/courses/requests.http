@@ -1,0 +1,8 @@
+POST http://localhost:3000/courses
+Content-Type: "application/json"
+
+{
+  "name": "Web Development",
+  "description": "this is the desc",
+  "categoryId": 1
+}

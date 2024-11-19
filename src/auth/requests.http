@@ -1,0 +1,11 @@
+### SIGNUP
+
+POST http://localhost:3000/auth/signup
+Content-Type: application/json
+
+{
+  "name": "Hazem Hamdy",
+  "email": "hazemhamdy389@gmail.com",
+  "password": "Test@123",
+  "age": 25
+}

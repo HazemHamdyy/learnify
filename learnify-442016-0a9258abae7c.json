@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "learnify-442016",
+  "private_key_id": "0a9258abae7c456615a6d7503363241f3d35852c",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCv6K36ahrCh7XR\nXY+qWluglFTutRDAoYIFRjS8p7wCXAsjnl4AcbYc5qFdMSn8M5LDX3lqFBOwDySK\ngNesrSEpL2UGsh6p+lU3xr6LZmRbueicj9x8a+w8eq/cXGrPnoQe12K8roMQq4DV\nwwdHAVU+zej//sPBmv4349Cf7bTgBAtNOANDDZzzy0moIg+4b91AWnmGBZJmDOEw\nNFnThbOOtVk2SYLi8h8Ew6Cwr/UYnLsOLgrdmy8+XVo9UiCIYxiPpwva6ijU1LTC\njTOWD5C2bobXs1SpgI5yqBjwCQodcUlWluTD9VdAIlsqgaNHdv7bQ/ngmgFMxvtQ\norhrmcdNAgMBAAECggEACPo7rCSvdO9uzLPqWcFUHR/fgxyOhvuMd9nGEJK8OkqZ\nmZnC0QxR76uoNJSxFdlJS4XwhloRSdJGr82KNEUpr2u8di5aTkZ5BD21CnGRUZ/C\noAA05SIE48Px0bHjFEbSFgOGsHvKM0GYHlCzwGCbCczXGql/3Wjxlxyd+xYrPaYh\nhIFDdDzrf2+AyPVTdzukCXDOWx+dwkIdS7vktGjghHYS/uTo/4+fVKZHDzfckFbU\ntexlimfu1JMcB4QFiG6m7r4V4hGi2M1x6FcEpm91r0wTUFR3jvCFtigrhU/1RCT1\noTvEBkccpuy2uedu7zvW3R+cqauhMzmfpB7IVg1y6QKBgQDa1cpBS1P83286EWAJ\nG6Hn6qxYRN/j/F3vDW9XDP8PigV//yTpAWW51LfTs65P700j/KQUe6ienOD9gXDp\n6rxY+IGFQ9HwI5YAcd4BrnOAqUdG0cVdmN+K6A2fDObhPAJzr7TaIWafsRrbWx8z\nruw4ijvfArzqfbp7M7IzUhrBZwKBgQDNyJpotZ39Ogrpb9DxsyvnKylf3pDsKh0y\nfen4szgKOVodUA0WCyN3sIKCu3gLGNMbbLCHSZjeJvnKSn6z9AZrsrmbmfAYdggn\nWGupgGz0vsuCOXusnJaoGdgJ7HXMg8gzBABoeCtmODsQENbdgcasHgUPSZv2st7D\n8mbq4nR9KwKBgGPKC7HcpM7yIGlNVQqyNBFqfO6/cY0oHrmM2dHLVmACo2FruqwZ\n/AZSjwUVsY435Ghdo4DHpuu1RA+1wASbCwpTP9TCSXCE+bj4M7F2mKr6BkuwCp0U\nwhM4oEV//6SD1eZlIEY75u05OLMAiWjrAkMCHi0itX0Emk3mFAO9FABPAoGAHWsV\nL+zu1hmrH64dh8AegaC4/Hyb6TcoD2TSwvwUAdorGM+t3z3eZyjzr27PfX6iB2Sl\nY+HQmcmmohW+QUmcdV8Ki8UY/tY42i8YzRWP/fkcrNQ86vND0mpHaTvFp2QbhbeH\nu2eahLV7NBPEM8xus4JjJMlYI490qzyHHAMdthsCgYAP+HpdEsbw0luYG+hjRqdc\n/otNYuQ9R5IdLoBjdaivNCSIUszMugMjdqaOIyfCxVXuEb/+mkUPHVe3dSFwqaoB\nU2yADMWFWwYMRmCh7sKGy4CEEEiX+PMPDkt/yJ+Np8JX3dT9+rtC8b5XhqZjUd6F\nISIHtZdfmOE1U8L2dh+DIA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "service-account@learnify-442016.iam.gserviceaccount.com",
+  "client_id": "106890321545886999576",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/service-account%40learnify-442016.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+model User {
+  id          Int       @id @default(autoincrement())
+  name        String
+  email       String    @unique
+  password    String
+  bio         String?
+  age         Int
+  imageUrl    String?   @map("image_url")
+  userType    UserType  @default(USER) @map("user_type")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt  @map("updated_at")
+  interests   Interest[]
+  courses     Course[]
+  enrollments Enrollment[]
+  reviews     Review[]
+  comments    Comment[]
+}
+
+model Course {
+  id                  Int           @id @default(autoincrement())
+  name                String
+  description         String
+  price               Float?
+  durationInMinutes   Float?        @map("duration_in_minutes")
+  imageUrl            String?       @map("image_url")
+  status              CourseStatus  @default(DRAFT)
+  categoryId          Int           @map("category_id")
+  teacherId           Int           @map("teacher_id")
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt  @map("updated_at")
+  category            Category      @relation(fields: [categoryId], references: [id])
+  teacher             User          @relation(fields: [teacherId], references: [id])
+  enrollments         Enrollment[]
+  reviews             Review[]
+  interests           Interest[]
+  sections            Section[]
+
+  @@map("courses")
+}
+
+model Category {
+  id        Int     @id @default(autoincrement())
+  name      String
+  courses   Course[]
+  
+
+  @@map("categories")
+}
+
+model Interest {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  courseId    Int       @map("category_id")
+  user        User      @relation(fields: [userId],references: [id])
+  course      Course    @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])
+
+  @@map("interests")
+}
+
+model Enrollment {
+  id               Int               @id @default(autoincrement())
+  studentId        Int               @map("student_id")
+  courseId         Int               @map("course_id")
+  paymentId        Int?              @unique
+  status           EnrollmentStatus  @default(PENDING)
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt  @map("updated_at")
+  expiryDate       DateTime?         @map("expiry_date")
+  student          User              @relation(fields: [studentId], references: [id])
+  course           Course            @relation(fields: [courseId], references: [id])
+  payment          Payment?          
+
+  @@unique([studentId, courseId])
+
+  @@map("enrollments")
+  }
+
+model Review {
+  id          Int     @id @default(autoincrement())
+  userId     Int     @map("student_id")
+  courseId    Int     @map("course_id")
+  content     String
+  rating      Float
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt  @map("updated_at")
+  user        User    @relation(fields: [userId], references: [id])
+  course      Course  @relation(fields: [courseId], references: [id])
+
+  @@map("reviews")
+
+}
+
+model Payment {
+  id                Int         @id @default(autoincrement())
+  enrollmentId      Int         @map("user_id") @unique
+  paymentDate       DateTime?   @map("payment_date")
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt  @map("updated_at") 
+  amount            Float
+  status            PaymentStatus @default(PENDING)
+  checkoutSessionId String
+  enrollment        Enrollment  @relation(fields: [enrollmentId], references: [id])
+
+  @@map("payments")
+}
+
+model Section {
+  id              Int              @id @default(autoincrement())
+  name            String  
+  courseId        Int              @map("course_id")
+  sectionNumber   Int              @map("section_number")
+  course          Course           @relation(fields: [courseId], references: [id])
+  lessons         Lesson[]
+
+  @@unique([courseId, sectionNumber])
+
+  @@map("sections")
+}
+
+model Lesson {
+  id                Int         @id @default(autoincrement())
+  name              String
+  sectionId         Int         @map("section_id")
+  contentType       ContentType @map("content_type")
+  durationInMinutes Float       @map("duration_in_minutes")
+  contentFileLink   String      @map("content_file_link")
+  isFree            Boolean     @map("is_free") @default(false)
+  section           Section     @relation(fields: [sectionId], references: [id])
+  comments          Comment[]
+
+  @@map("lessons")
+}
+
+model Comment {
+  id                Int          @id @default(autoincrement())
+  content           String
+  commentId         Int?         @map("comment_id")
+  lessonId          Int?         @map("lesson_id")
+  userId            Int          @map("user_id")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt  @map("updated_at")
+  lesson            Lesson?       @relation(fields: [lessonId], references: [id])
+  user              User          @relation(fields: [userId], references: [id])
+  child_comments    Comment[]     @relation("ParentComments")
+  parent_comment    Comment?      @relation("ParentComments", fields: [commentId], references: [id])
+
+  @@map("comments")
+}
+
+enum UserType {
+  USER
+  TEACHER
+  ADMIN
+} 
+
+enum CourseStatus {
+  DRAFT
+  UPDATING
+  PUBLISHED
+}
+
+enum EnrollmentStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum PaymentStatus {
+  SUCCESS
+  FAILED
+  PENDING
+}
+
+enum ContentType {
+  VIDEO
+  AUDIO
+  TEXT
+}
