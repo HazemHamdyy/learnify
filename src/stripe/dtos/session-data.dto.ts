@@ -1,4 +1,4 @@
-import { IsEmail, IsInt, IsString } from 'class-validator';
+import { IsEmail, IsInt, IsString, IsUrl } from 'class-validator';
 
 export class SessionDataDto {
   @IsInt()
@@ -15,4 +15,10 @@ export class SessionDataDto {
 
   @IsInt()
   coursePrice: number;
+
+  @IsUrl()
+  successUrl: string;
+
+  @IsUrl()
+  cancelUrl: string;
 }

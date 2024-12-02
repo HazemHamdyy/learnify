@@ -34,7 +34,23 @@ export class LessonsService {
     const lesson = await this.prisma.lesson.findUnique({
       where: { id },
       include: {
-        section: { include: { course: { include: { enrollments: true } } } },
+        section: {
+          select: {
+            id: true,
+            name: true,
+            course: {
+              select: {
+                id: true,
+                name: true,
+                teacherId: true,
+                enrollments: {
+                  where: { studentId: userId },
+                  select: { id: true, studentId: true, status: true },
+                },
+              },
+            },
+          },
+        },
       },
     });
     const enrollments = lesson.section.course.enrollments;
@@ -108,7 +124,7 @@ export class LessonsService {
         },
         _count: {
           select: {
-            child_comments: true,
+            childComments: true,
           },
         },
       },

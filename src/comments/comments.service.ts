@@ -27,7 +27,7 @@ export class CommentsService {
             imageUrl: true,
           },
         },
-        child_comments: {
+        childComments: {
           select: {
             id: true,
             content: true,
@@ -42,7 +42,7 @@ export class CommentsService {
         },
         _count: {
           select: {
-            child_comments: true,
+            childComments: true,
           },
         },
       },

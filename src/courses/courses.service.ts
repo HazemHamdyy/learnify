@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -8,23 +9,39 @@ import { CreateCourseDto } from './dtos/create-course.dto';
 import { UpdateCourseDto } from './dtos/update-course.dto';
 import { Course } from '@prisma/client';
 import { FilterCoursesDto } from './dtos/filter-courses.dto';
+import { UserTypeEnum } from 'src/users/enums/user-type.enum';
 
 @Injectable()
 export class CoursesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(
+  async create(
     createCourseDto: CreateCourseDto,
     userId: number,
-  ): Promise<Course | null> {
-    const { categoryId, ...rest } = createCourseDto;
-    return this.prisma.course.create({
-      data: {
-        ...rest,
-        category: { connect: { id: categoryId } },
-        teacher: { connect: { id: userId } },
-      },
-    });
+  ): Promise<Course | null | HttpException> {
+    try {
+      const { categoryId, ...rest } = createCourseDto;
+      const user = await this.prisma.user.findUnique({ where: { id: userId } });
+      if (user.userType !== UserTypeEnum.TEACHER) {
+        return new BadRequestException(
+          'You must be a teacher to create your course',
+        );
+      }
+      return await this.prisma.course.create({
+        data: {
+          ...rest,
+          category: { connect: { id: categoryId } },
+          teacher: { connect: { id: userId } },
+        },
+      });
+    } catch (err) {
+      if (err.code === 'P2025') {
+        throw new NotFoundException(
+          `No category with this id: ${createCourseDto.categoryId}`,
+        );
+      }
+      throw new BadRequestException('Something went wrong');
+    }
   }
 
   findAll(): Promise<Course[] | null> {
@@ -50,6 +67,8 @@ export class CoursesService {
           categoryId: filterCoursesDto.categoryId,
         }),
       },
+      skip: filterCoursesDto.skip * filterCoursesDto.take,
+      take: filterCoursesDto.take,
     });
   }
 
@@ -76,19 +95,18 @@ export class CoursesService {
     userId: number,
     id: number,
     updateCourseDto: UpdateCourseDto,
-  ): Promise<Course | null> {
+  ): Promise<Course | null | HttpException> {
     try {
       const course = await this.prisma.course.updateMany({
         where: { id, teacherId: userId },
         data: updateCourseDto,
       });
+      if (!course.count) {
+        return new NotFoundException(`Course with ID ${id} not found.`);
+      }
       return course[0];
     } catch (err) {
-      if (err.code === 'P2025') {
-        throw new NotFoundException(`Course with ID ${id} not found.`);
-      } else {
-        throw new BadRequestException(`Something went wrong`);
-      }
+      throw new BadRequestException(`Something went wrong`);
     }
   }
 

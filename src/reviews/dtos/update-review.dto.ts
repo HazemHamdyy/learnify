@@ -1,6 +1,20 @@
-import { OmitType, PartialType } from '@nestjs/mapped-types';
-import { CreateReviewDto } from './create-review.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber, IsString } from 'class-validator';
 
-export class UpdateReviewDto extends PartialType(
-  OmitType(CreateReviewDto, ['courseId'] as const),
-) {}
+export class UpdateReviewDto {
+  @ApiProperty({
+    description: `review content`,
+    required: true,
+    example: 'This is a very good course',
+  })
+  @IsString()
+  content: string;
+
+  @ApiProperty({
+    description: `rate the course`,
+    required: true,
+    example: 8,
+  })
+  @IsNumber()
+  rating: number;
+}

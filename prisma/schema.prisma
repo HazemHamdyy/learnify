@@ -13,7 +13,7 @@ model User {
   email       String    @unique
   password    String
   bio         String?
-  age         Int
+  dateOfBirth  DateTime?  @map("date_of_birth")
   imageUrl    String?   @map("image_url")
   userType    UserType  @default(USER) @map("user_type")
   createdAt   DateTime  @default(now()) @map("created_at")
@@ -33,12 +33,12 @@ model Course {
   durationInMinutes   Float?        @map("duration_in_minutes")
   imageUrl            String?       @map("image_url")
   status              CourseStatus  @default(DRAFT)
-  categoryId          Int           @map("category_id")
+  categoryId          Int?          @map("category_id")
   teacherId           Int           @map("teacher_id")
   createdAt           DateTime      @default(now()) @map("created_at")
   updatedAt           DateTime      @updatedAt  @map("updated_at")
-  category            Category      @relation(fields: [categoryId], references: [id])
-  teacher             User          @relation(fields: [teacherId], references: [id])
+  category            Category?     @relation(fields: [categoryId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  teacher             User          @relation(fields: [teacherId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   enrollments         Enrollment[]
   reviews             Review[]
   interests           Interest[]
@@ -60,8 +60,8 @@ model Interest {
   id          Int       @id @default(autoincrement())
   userId      Int       @map("user_id")
   courseId    Int       @map("category_id")
-  user        User      @relation(fields: [userId],references: [id])
-  course      Course    @relation(fields: [courseId], references: [id])
+  user        User      @relation(fields: [userId],references: [id], onUpdate: Cascade, onDelete: Cascade)
+  course      Course    @relation(fields: [courseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
   @@unique([userId, courseId])
 
@@ -72,14 +72,13 @@ model Enrollment {
   id               Int               @id @default(autoincrement())
   studentId        Int               @map("student_id")
   courseId         Int               @map("course_id")
-  paymentId        Int?              @unique
   status           EnrollmentStatus  @default(PENDING)
   createdAt        DateTime          @default(now()) @map("created_at")
   updatedAt        DateTime          @updatedAt  @map("updated_at")
   expiryDate       DateTime?         @map("expiry_date")
-  student          User              @relation(fields: [studentId], references: [id])
-  course           Course            @relation(fields: [courseId], references: [id])
-  payment          Payment?          
+  student          User              @relation(fields: [studentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  course           Course            @relation(fields: [courseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  payment          Payment?         
 
   @@unique([studentId, courseId])
 
@@ -88,14 +87,14 @@ model Enrollment {
 
 model Review {
   id          Int     @id @default(autoincrement())
-  userId     Int     @map("student_id")
+  userId      Int     @map("student_id")
   courseId    Int     @map("course_id")
   content     String
   rating      Float
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt  @map("updated_at")
-  user        User    @relation(fields: [userId], references: [id])
-  course      Course  @relation(fields: [courseId], references: [id])
+  user        User    @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  course      Course  @relation(fields: [courseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
   @@map("reviews")
 
@@ -103,14 +102,14 @@ model Review {
 
 model Payment {
   id                Int         @id @default(autoincrement())
-  enrollmentId      Int         @map("user_id") @unique
+  enrollmentId      Int?        @map("enrollment_id") @unique
   paymentDate       DateTime?   @map("payment_date")
   createdAt         DateTime    @default(now()) @map("created_at")
   updatedAt         DateTime    @updatedAt  @map("updated_at") 
   amount            Float
   status            PaymentStatus @default(PENDING)
   checkoutSessionId String
-  enrollment        Enrollment  @relation(fields: [enrollmentId], references: [id])
+  enrollment        Enrollment?  @relation(fields: [enrollmentId], references: [id], onUpdate: Cascade, onDelete: SetNull)
 
   @@map("payments")
 }
@@ -120,7 +119,7 @@ model Section {
   name            String  
   courseId        Int              @map("course_id")
   sectionNumber   Int              @map("section_number")
-  course          Course           @relation(fields: [courseId], references: [id])
+  course          Course           @relation(fields: [courseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   lessons         Lesson[]
 
   @@unique([courseId, sectionNumber])
@@ -131,12 +130,13 @@ model Section {
 model Lesson {
   id                Int         @id @default(autoincrement())
   name              String
+  lessonNumber      Int         @map("lesson_number")
   sectionId         Int         @map("section_id")
   contentType       ContentType @map("content_type")
   durationInMinutes Float       @map("duration_in_minutes")
   contentFileLink   String      @map("content_file_link")
   isFree            Boolean     @map("is_free") @default(false)
-  section           Section     @relation(fields: [sectionId], references: [id])
+  section           Section     @relation(fields: [sectionId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   comments          Comment[]
 
   @@map("lessons")
@@ -145,15 +145,15 @@ model Lesson {
 model Comment {
   id                Int          @id @default(autoincrement())
   content           String
-  commentId         Int?         @map("comment_id")
+  parentCommentId   Int?         @map("parent_comment_id")
   lessonId          Int?         @map("lesson_id")
   userId            Int          @map("user_id")
   createdAt         DateTime      @default(now()) @map("created_at")
   updatedAt         DateTime      @updatedAt  @map("updated_at")
-  lesson            Lesson?       @relation(fields: [lessonId], references: [id])
+  lesson            Lesson?       @relation(fields: [lessonId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   user              User          @relation(fields: [userId], references: [id])
-  child_comments    Comment[]     @relation("ParentComments")
-  parent_comment    Comment?      @relation("ParentComments", fields: [commentId], references: [id])
+  childComments    Comment[]     @relation("ParentComments")
+  parentComment    Comment?      @relation("ParentComments", fields: [parentCommentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
   @@map("comments")
 }

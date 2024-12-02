@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateReviewDto } from './dtos/create-review.dto';
 import { UpdateReviewDto } from './dtos/update-review.dto';
+import { EnrollmentStatusEnum } from 'src/enrollments/enums/enrollment-status.enum';
 
 @Injectable()
 export class ReviewsService {
@@ -10,10 +11,31 @@ export class ReviewsService {
   async create(userId: number, createReviewDto: CreateReviewDto) {
     const course = await this.prisma.course.findUnique({
       where: { id: createReviewDto.courseId },
+      select: {
+        teacherId: true,
+        enrollments: {
+          select: {
+            status: true,
+            studentId: true,
+          },
+          where: {
+            studentId: userId,
+          },
+        },
+      },
     });
 
     if (course.teacherId === userId) {
       throw new BadRequestException("You can't review your own course");
+    }
+
+    if (
+      course.enrollments[0]?.studentId !== userId ||
+      course.enrollments[0]?.status === EnrollmentStatusEnum.PENDING
+    ) {
+      throw new BadRequestException(
+        'You can review your enrolled courses only',
+      );
     }
 
     return await this.prisma.review.create({

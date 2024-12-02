@@ -8,20 +8,18 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
-import { UsersService } from '../users/users.service';
 import { AuthPayloadDto } from './dtos/auth-payload.dto';
 import { AuthService } from './auth.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { UpadatePasswordDto } from './dtos/update-password.dto';
 import { CurrentUser } from 'src/users/decorators/current-user.decorator';
 import { User } from '@prisma/client';
+import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly authService: AuthService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
+  @ApiOperation({ summary: 'signup new user' })
   @Post('/signup')
   async signup(@Body() createUserDto: CreateUserDto, @Session() session: any) {
     const user = await this.authService.signup(createUserDto);

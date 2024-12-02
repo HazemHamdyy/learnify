@@ -21,7 +21,7 @@ export class AuthService {
   async validateUser({
     email,
     password,
-  }: AuthPayloadDto): Promise<User | null> {
+  }: AuthPayloadDto): Promise<UserWithoutPassword | null> {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) {
       throw new UnauthorizedException('Invalid Credintial');
@@ -32,14 +32,16 @@ export class AuthService {
     if (hash.toString('hex') !== storedHash) {
       throw new UnauthorizedException('Invalid Credintial');
     }
-    return user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: newPassword, ...newRest } = user;
+    return newRest;
   }
 
   async signup({
     email,
     password,
     ...rest
-  }: CreateUserDto): Promise<User | null> {
+  }: CreateUserDto): Promise<UserWithoutPassword | null> {
     // check if the email is already used
     const oldUser = await this.prisma.user.findUnique({ where: { email } });
     if (oldUser) {
@@ -58,7 +60,10 @@ export class AuthService {
       data: { email, password: result, ...rest },
     });
 
-    return user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: newPassword, ...newRest } = user;
+
+    return newRest;
   }
 
   async updatePassword(

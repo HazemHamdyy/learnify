@@ -5,6 +5,8 @@ import { Enrollment, User } from '@prisma/client';
 import { StripeService } from 'src/stripe/stripe.service';
 import { SessionDataDto } from 'src/stripe/dtos/session-data.dto';
 import { UpdateEnrollmentDto } from './dtos/update-enrollment.dto';
+import { EnrollmentStatusEnum } from './enums/enrollment-status.enum';
+import { Request } from 'express';
 
 type Transaction = {
   enrollment: Enrollment;
@@ -21,6 +23,7 @@ export class EnrollmentsService {
   async create(
     user: User,
     createEnrollmentDto: CreateEnrollmentDto,
+    req: Request,
   ): Promise<Transaction | null> {
     const course = await this.prisma.course.findUnique({
       where: { id: createEnrollmentDto.courseId },
@@ -32,6 +35,12 @@ export class EnrollmentsService {
           ...createEnrollmentDto,
         },
       });
+      const protocol = req.protocol;
+      const host = req.get('host');
+      const successPath = `/enrollments/success/${enrollment.id}`;
+      const cancelPath = `/enrollments/cancel`;
+      const successUrl = `${protocol}://${host}${successPath}`;
+      const cancelUrl = `${protocol}://${host}${cancelPath}`;
 
       const sessionData: SessionDataDto = {
         userId: user.id,
@@ -39,25 +48,19 @@ export class EnrollmentsService {
         userEmail: user.email,
         courseName: course.name,
         coursePrice: Math.round(course.price),
+        successUrl,
+        cancelUrl,
       };
 
-      const session = await this.stripeService.createCheckoutSession(
-        createEnrollmentDto.successUrl,
-        createEnrollmentDto.cancelUrl,
-        sessionData,
-      );
+      const session =
+        await this.stripeService.createCheckoutSession(sessionData);
 
-      const payment = await prisma.payment.create({
+      await prisma.payment.create({
         data: {
           enrollment: { connect: { id: enrollment.id } },
-          amount: course.price,
+          amount: course.price * 100,
           checkoutSessionId: session.id,
         },
-      });
-
-      await prisma.enrollment.update({
-        where: { id: enrollment.id },
-        data: { paymentId: payment.id },
       });
 
       return { enrollment, seesionUrl: session.url };
@@ -82,5 +85,24 @@ export class EnrollmentsService {
     return this.prisma.enrollment.deleteMany({
       where: { AND: [{ id }, { status: 'PENDING' }] },
     });
+  }
+
+  async checkPayment(id: number) {
+    const payment = await this.prisma.payment.findUnique({
+      where: { enrollmentId: id },
+    });
+    const isPaid = await this.stripeService.isCheckoutSessionPaid(
+      payment.checkoutSessionId,
+    );
+    if (!isPaid) return false;
+    await this.prisma.enrollment.update({
+      where: { id },
+      data: { status: EnrollmentStatusEnum.ACTIVE },
+    });
+    await this.prisma.payment.update({
+      where: { id: payment.id },
+      data: { status: 'SUCCESS' },
+    });
+    return true;
   }
 }

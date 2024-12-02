@@ -15,21 +15,19 @@ export class StripeService {
     currency: string,
   ): Promise<Stripe.PaymentIntent> {
     return this.stripe.paymentIntents.create({
-      amount,
+      amount: amount * 100,
       currency,
     });
   }
 
   async createCheckoutSession(
-    successUrl: string,
-    cancelUrl: string,
     sessionDataDto: SessionDataDto,
   ): Promise<Stripe.Checkout.Session> {
     return this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
-      success_url: successUrl,
-      cancel_url: cancelUrl,
+      success_url: sessionDataDto.successUrl,
+      cancel_url: sessionDataDto.cancelUrl,
       line_items: [
         {
           price_data: {
@@ -37,7 +35,7 @@ export class StripeService {
             product_data: {
               name: `${sessionDataDto.courseName} Course`,
             },
-            unit_amount: sessionDataDto.coursePrice,
+            unit_amount: sessionDataDto.coursePrice * 100,
           },
           quantity: 1,
         },
@@ -49,5 +47,14 @@ export class StripeService {
         userName: sessionDataDto.userName,
       },
     });
+  }
+
+  async isCheckoutSessionPaid(sessionId: string) {
+    try {
+      const session = await this.stripe.checkout.sessions.retrieve(sessionId);
+      return session.payment_status === 'paid';
+    } catch (error) {
+      throw new Error(`Failed to retrieve Checkout Session: ${error.message}`);
+    }
   }
 }
