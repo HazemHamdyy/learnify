@@ -103,8 +103,8 @@ export class LessonsService {
     return await this.prisma.lesson.delete({ where: { id } });
   }
 
-  findComments(lessonId: number) {
-    return this.prisma.comment.findMany({
+  async findComments(lessonId: number) {
+    return await this.prisma.comment.findMany({
       where: {
         lessonId,
       },

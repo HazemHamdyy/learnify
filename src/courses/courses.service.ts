@@ -44,12 +44,14 @@ export class CoursesService {
     }
   }
 
-  findAll(): Promise<Course[] | null> {
-    return this.prisma.course.findMany();
+  async findAll(): Promise<Course[] | null> {
+    return await this.prisma.course.findMany();
   }
 
-  findFiltered(filterCoursesDto: FilterCoursesDto): Promise<Course[] | null> {
-    return this.prisma.course.findMany({
+  async findFiltered(
+    filterCoursesDto: FilterCoursesDto,
+  ): Promise<Course[] | null> {
+    return await this.prisma.course.findMany({
       where: {
         ...(filterCoursesDto.name && {
           name: { contains: filterCoursesDto.name, mode: 'insensitive' },
@@ -146,5 +148,25 @@ export class CoursesService {
       }),
     );
     return courses;
+  }
+
+  async interestOnCourse(id: number, userId: number) {
+    return await this.prisma.interest.create({
+      data: {
+        userId,
+        courseId: id,
+      },
+    });
+  }
+
+  async deleteInterest(id: number, userId: number) {
+    return await this.prisma.interest.delete({
+      where: {
+        userId_courseId: {
+          userId,
+          courseId: id,
+        },
+      },
+    });
   }
 }

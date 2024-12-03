@@ -68,12 +68,16 @@ export class EnrollmentsService {
     return transaction;
   }
 
-  findOneById(id: number) {
-    return this.prisma.enrollment.findUnique({ where: { id } });
+  async findOneById(id: number) {
+    return await this.prisma.enrollment.findUnique({ where: { id } });
   }
 
-  update(id: number, userId: number, updateEnrollmentDto: UpdateEnrollmentDto) {
-    return this.prisma.enrollment.updateMany({
+  async update(
+    id: number,
+    userId: number,
+    updateEnrollmentDto: UpdateEnrollmentDto,
+  ) {
+    return await this.prisma.enrollment.updateMany({
       where: {
         AND: [{ id }, { studentId: userId }, { status: { not: 'PENDING' } }],
       },
@@ -81,8 +85,8 @@ export class EnrollmentsService {
     });
   }
 
-  delete(id: number) {
-    return this.prisma.enrollment.deleteMany({
+  async delete(id: number) {
+    return await this.prisma.enrollment.deleteMany({
       where: { AND: [{ id }, { status: 'PENDING' }] },
     });
   }

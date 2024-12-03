@@ -7,14 +7,14 @@ import { UpdateCommentDto } from './dtos/update-comment.dto';
 export class CommentsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(userId: number, createCommentDto: CreateCommentDto) {
-    return this.prisma.comment.create({
+  async create(userId: number, createCommentDto: CreateCommentDto) {
+    return await this.prisma.comment.create({
       data: { userId, ...createCommentDto },
     });
   }
 
-  findOneById(id: number) {
-    return this.prisma.comment.findUnique({
+  async findOneById(id: number) {
+    return await this.prisma.comment.findUnique({
       where: { id },
       select: {
         id: true,
@@ -49,14 +49,14 @@ export class CommentsService {
     });
   }
 
-  update(id: number, userId: number, updateCommentDto: UpdateCommentDto) {
-    return this.prisma.comment.updateMany({
+  async update(id: number, userId: number, updateCommentDto: UpdateCommentDto) {
+    return await this.prisma.comment.updateMany({
       where: { id, userId },
       data: updateCommentDto,
     });
   }
 
-  delete(id: number, userId: number) {
-    return this.prisma.comment.deleteMany({ where: { id, userId } });
+  async delete(id: number, userId: number) {
+    return await this.prisma.comment.deleteMany({ where: { id, userId } });
   }
 }

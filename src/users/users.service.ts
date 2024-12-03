@@ -89,8 +89,8 @@ export class UsersService {
     }
   }
 
-  findMyLearnings(userId: number): Promise<Course[] | null> {
-    return this.prisma.course.findMany({
+  async findMyLearnings(userId: number): Promise<Course[] | null> {
+    return await this.prisma.course.findMany({
       where: {
         enrollments: {
           some: {

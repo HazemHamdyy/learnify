@@ -137,4 +137,40 @@ export class CoursesController {
   ) {
     return this.coursesServices.deleteByOwner(id, user.id);
   }
+
+  @ApiOperation({
+    summary: 'Add course to interests',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'The unique ID of the course',
+    example: '1',
+  })
+  @Post('/:id/interest')
+  @UseGuards(AuthGuard)
+  interestOnCourse(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.coursesServices.interestOnCourse(id, user.id);
+  }
+
+  @ApiOperation({
+    summary: 'Delete course from interests',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'The unique ID of the course',
+    example: '1',
+  })
+  @Delete('/:id/interest')
+  @UseGuards(AuthGuard)
+  deleteInterestOnCourse(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.coursesServices.deleteInterest(id, user.id);
+  }
 }

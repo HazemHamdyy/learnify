@@ -43,8 +43,8 @@ export class ReviewsService {
     });
   }
 
-  findOneById(id: number) {
-    return this.prisma.review.findUnique({
+  async findOneById(id: number) {
+    return await this.prisma.review.findUnique({
       where: { id },
       include: {
         user: { select: { id: true, name: true, imageUrl: true } },
@@ -53,14 +53,14 @@ export class ReviewsService {
     });
   }
 
-  update(id: number, userId: number, updateReviewDto: UpdateReviewDto) {
-    return this.prisma.review.updateMany({
+  async update(id: number, userId: number, updateReviewDto: UpdateReviewDto) {
+    return await this.prisma.review.updateMany({
       where: { id, userId },
       data: updateReviewDto,
     });
   }
 
-  delete(id: number, userId: number) {
-    return this.prisma.review.deleteMany({ where: { id, userId } });
+  async delete(id: number, userId: number) {
+    return await this.prisma.review.deleteMany({ where: { id, userId } });
   }
 }
