@@ -1,40 +1,16 @@
-version: '3'
+version: '3.8'
+
 services:
-  node_app:
-    container_name: node-container
-    build: 
+  app:
+    build:
       context: .
-    volumes:
-      - .:/app
-      - /app/node_modules # This line is likely causing the issue
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=development
+      NODE_ENV: production
     env_file:
       - ./.env
-    depends_on:
-      - postgres
-
-  postgres:
-    image: postgres
-    restart: always
-    ports:
-      - "5432:5432"
-    env_file:
-      - .env
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 12345678
-      POSTGRES_DB: learnify
     volumes:
-      - postgres_db:/var/lib/postgresql/data
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
-
-volumes:
-  postgres_db:
+      - .:/app
+      - /app/node_modules
